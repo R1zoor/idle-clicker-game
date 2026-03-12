@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Тест</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <h1>Мой первый кликер</h1>
+
+  <div id="game">
+  <div class="panel">
+    <h2>Ресурсы</h2>
+    <p>
+      <img src="img/coin.png" alt="монета" class="coin-icon">
+      <span id="coins">0</span>
+    </p>
+    <p>Доход за клик: <span id="income-per-click">0</span></p>
+    <p>Доход в секунду: <span id="coins-per-second">0</span></p>
+  </div>
+
+  <div class="panel">
+    <h2>Производство</h2>
+    <button id="click-button">
+      Клик
+    </button>
+
+    <button id="upgrade-button">
+      Улучшить клик (+1 за клик) — цена: <span id="upgrade-cost">10</span>
+    </button>
+
+    <button id="auto-button">
+      Купить авто-добычу (+1 в сек) — цена: <span id="auto-cost">50</span>
+    </button>
+
+    <button id="auto2-button">
+      Купить супер-добычу (+5 в сек) — цена: <span id="auto2-cost">250</span>
+    </button>
+
+  </div>
+
+      <div class="panel">
+    <h2>Бусты / Дерево</h2>
+    <p>Шанс крита: <span id="crit-chance-text">5%</span></p>
+    <p>Множитель крита: <span id="crit-mult-text">x3</span></p>
+
+    <div id="skill-tree">
+      <button class="skill-node" id="skill-crit-chance">
+        Крит-шанс +5%<br>
+        Стоимость: 1 кристалл
+      </button>
+
+      <button class="skill-node" id="skill-crit-mult">
+        Крит-множитель +1<br>
+        Стоимость: 2 кристалла
+      </button>
+
+      <button class="skill-node" id="skill-income">
+        Доход +20%<br>
+        Стоимость: 3 кристалла
+      </button>
+    </div>
+  </div>
+
+
+    <div class="panel">
+    <h2>Перерождение</h2>
+    <p>Всего добыто: <span id="lifetime-coins">0</span></p>
+    <p>Кристаллы: <span id="prestige-points">0</span></p>
+    <p>Бонус к доходу: <span id="prestige-bonus-text">+0%</span></p>
+
+    <button id="prestige-button">
+      Переродиться и получить кристаллы
+    </button>
+
+    <button id="hard-reset-button">
+      Полный сброс прогресса
+    </button>
+  </div>
+
+</div>
+
+
+  <script src="js/script.js"></script>
+</body>
+</html>
