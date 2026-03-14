@@ -184,3 +184,40 @@ body {
   box-shadow: 0 0 8px rgba(255, 235, 59, 0.5);
 }
 
+#tabs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.tab-button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background-color: #263238;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.tab-button.active {
+  background-color: #ffeb3b;
+  color: #000;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.tab-button.hidden {
+  display: none;
+}
+
