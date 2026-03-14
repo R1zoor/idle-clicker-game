@@ -21,12 +21,10 @@ let skillCritChanceLevel = 0;
 let skillCritMultLevel = 0;
 let skillIncomeLevel = 0;
 
-
 // константы (DOM)
 const coinsSpan = document.getElementById('coins');
 const coinsPerSecondSpan = document.getElementById('coins-per-second');
 const incomePerClickSpan = document.getElementById('income-per-click');
-
 
 const clickButton = document.getElementById('click-button');
 const upgradeButton = document.getElementById('upgrade-button');
@@ -51,6 +49,28 @@ const skillCritChanceBtn = document.getElementById('skill-crit-chance');
 const skillCritMultBtn = document.getElementById('skill-crit-mult');
 const skillIncomeBtn = document.getElementById('skill-income');
 
+// вкладки
+const tabButtons = document.querySelectorAll('.tab-button');
+const tabContents = document.querySelectorAll('.tab-content');
+const tabBtnMain = document.getElementById('tab-btn-main');
+const tabBtnBoosts = document.getElementById('tab-btn-boosts');
+const tabBtnPrestige = document.getElementById('tab-btn-prestige');
+
+// переключение вкладок
+tabButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.classList.contains('hidden')) return;
+
+    const tab = btn.dataset.tab;
+
+    tabButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    tabContents.forEach(c => {
+      c.classList.toggle('active', c.id === 'tab-' + tab);
+    });
+  });
+});
 
 // ===== UI и функции =====
 
@@ -61,11 +81,35 @@ function calcPrestigeGain() {
   return Math.floor(Math.pow(runCoins / 800, 0.6));
 }
 
+function updateTabsVisibility() {
+  // условие открытия бустов
+  const boostsUnlocked = (prestigePoints >= 1) || (runCoins >= 2000);
+
+  // условие открытия перерождения
+  const prestigeGain = calcPrestigeGain();
+  const prestigeUnlocked = prestigeGain > 0 || prestigePoints > 0;
+
+  // по умолчанию прячем
+  tabBtnBoosts.classList.toggle('hidden', !boostsUnlocked);
+  tabBtnPrestige.classList.toggle('hidden', !prestigeUnlocked);
+
+  // если текущая активная вкладка скрыта — переключаем на "Игра"
+  const activeTabBtn = document.querySelector('.tab-button.active');
+  if (activeTabBtn && activeTabBtn.classList.contains('hidden')) {
+    activeTabBtn.classList.remove('active');
+    tabBtnMain.classList.add('active');
+
+    tabContents.forEach(c => {
+      c.classList.toggle('active', c.id === 'tab-main');
+    });
+  }
+}
 
 function updateUI() {
   coinsSpan.textContent = coins;
   coinsPerSecondSpan.textContent = coinsPerSecond;
-    // базовый доход за клик без рандома, с критом как средним значением
+
+  // базовый доход за клик без рандома, с критом как средним значением
   const expectedCritMult = 1 + critChance * (critMultiplier - 1); // средний множитель с учётом шанса
   const baseClickGain = coinsPerClick * expectedCritMult;
   const totalClickGain = Math.floor(baseClickGain * (1 + prestigeBonus));
@@ -90,18 +134,17 @@ function updateUI() {
   const gain = calcPrestigeGain();
   prestigeButton.disabled = gain <= 0;
 
-    // дерево прокачки: визуальное состояние
+  // дерево прокачки: визуальное состояние
   skillCritChanceBtn.classList.toggle('unlocked', skillCritChanceLevel > 0);
   skillCritMultBtn.classList.toggle('unlocked', skillCritMultLevel > 0);
   skillIncomeBtn.classList.toggle('unlocked', skillIncomeLevel > 0);
 
   // доступность по кристаллам и зависимостям
   skillCritChanceBtn.disabled = prestigePoints < 1; // всегда доступен, если есть 1 кристалл
-
   skillCritMultBtn.disabled = prestigePoints < 2 || skillCritChanceLevel === 0; // требует крит-шанс
-
   skillIncomeBtn.disabled = prestigePoints < 3;
 
+  updateTabsVisibility();
 }
 
 // ===== Логика игры =====
@@ -167,7 +210,6 @@ prestigeButton.addEventListener('click', () => {
   // добавляем кристаллы
   prestigePoints += gain;
 
-
   // сбрасываем текущий прогресс, но НЕ кристаллы
   coins = 0;
   coinsPerClick = 1;
@@ -189,7 +231,6 @@ hardResetButton.addEventListener('click', () => {
   const sure = confirm('Точно сбросить весь прогресс? Это действие нельзя отменить.');
   if (!sure) return;
 
-  // очищаем сохранение только для нашей игры [web:156][web:160][web:164]
   localStorage.removeItem(SAVE_KEY);
 
   // стартовые значения
@@ -209,6 +250,11 @@ hardResetButton.addEventListener('click', () => {
   prestigePoints = 0;
   prestigeBonus = 0;
 
+  skillCritChanceLevel = 0;
+  skillCritMultLevel = 0;
+  skillIncomeLevel = 0;
+
+  saveGame();
   updateUI();
 });
 
