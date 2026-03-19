@@ -1,6 +1,6 @@
 # idle-clicker-game
 classic clicker/incremental 
-    RU
+
   # Idle Clicker
 
 Небольшой браузерный кликер с системой перерождений и древом постоянных улучшений.
@@ -17,7 +17,6 @@ classic clicker/incremental
 - HTML, CSS, JavaScript (без фреймворков).
 - localStorage для сохранения прогресса.
 
-    EN
 # Idle Clicker
 
 A small browser clicker game with a prestige system and a permanent upgrade tree.
