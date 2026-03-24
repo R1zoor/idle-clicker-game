@@ -283,3 +283,8 @@ body {
 #skill-modal-status.cant-buy {
   color: #f44336;
 }
+
+.hidden {
+  display: none;
+}
+

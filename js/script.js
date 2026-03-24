@@ -2,6 +2,11 @@
 let coins = 0;
 let coinsPerClick = 1;
 
+let gems = 0; // новая валюта
+let gemsAutoBoostLevel = 0;
+const gemsAutoBoostButton = document.getElementById('gems-auto-boost-button');
+let autoIncomeMultiplier = 1;
+
 let upgrade1Cost = 10;     // +1 за клик
 let upgrade5Cost = 100;    // +5 за клик
 let upgrade10Cost = 1000;  // +10 за клик
@@ -29,9 +34,16 @@ let skillMult1Bought = false;
 let skillMult2Bought = false;
 let skillNewCurrencyBought = false;
 
+let hasSeenPrestigeTutorial = false;
+
+
 // константы (DOM)
-const coinsSpan = document.getElementById('coins');
+const coinsMainSpan = document.getElementById('coins-main');
+const coinsUpgradesSpan = document.getElementById('coins-upgrades');
 const coinsPerSecondSpan = document.getElementById('coins-per-second');
+
+const gemsMainSpan = document.getElementById('gems-main');
+const gemsUpgradesSpan = document.getElementById('gems-upgrades');
 
 const clickButton = document.getElementById('click-button');
 
@@ -74,6 +86,12 @@ const skillModalCost = document.getElementById('skill-modal-cost');
 const skillModalBuy = document.getElementById('skill-modal-buy');
 const skillModalClose = document.getElementById('skill-modal-close');
 
+const gemsMainPanel = document.getElementById('gems-main-panel');
+const gemsUpgradesPanel = document.getElementById('gems-upgrades-panel');
+const gemsUpgradesShop = document.getElementById('gems-upgrades-shop');
+
+
+
 let currentSkillId = null;
 
 const skillModalStatus = document.getElementById('skill-modal-status');
@@ -113,8 +131,17 @@ function updateTabsVisibility() {
 
 
 function updateUI() {
-  coinsSpan.textContent = coins;
-  coinsPerSecondSpan.textContent = coinsPerSecond;
+  coinsMainSpan.textContent = coins;
+  coinsUpgradesSpan.textContent = coins;
+
+  gemsMainSpan.textContent = Math.floor(gems);
+  gemsUpgradesSpan.textContent = Math.floor(gems);
+  gemsAutoBoostButton.disabled = !skillNewCurrencyBought || gems < 100;
+
+  // показываем авто-добычу с учётом мультипликатора
+  coinsPerSecondSpan.textContent = Math.floor(coinsPerSecond * autoIncomeMultiplier);
+
+
 
   // цены
   upgrade1CostSpan.textContent = upgrade1Cost;
@@ -167,6 +194,12 @@ function updateUI() {
   // Ветка B: крит-множитель
   skillMult2Btn.classList.toggle('hidden', !skillMult1Bought);
 
+    const gemsUnlocked = skillNewCurrencyBought;
+    if (gemsMainPanel && gemsUpgradesPanel && gemsUpgradesShop) {
+      gemsMainPanel.classList.toggle('hidden', !gemsUnlocked);
+      gemsUpgradesPanel.classList.toggle('hidden', !gemsUnlocked);
+      gemsUpgradesShop.classList.toggle('hidden', !gemsUnlocked);
+    }
 
   updateTabsVisibility();
 }
@@ -246,28 +279,35 @@ auto2Button.addEventListener('click', () => {
 });
 
 function openPrestigeScreen() {
-  // активируем вкладку бустов
   tabButtons.forEach(b => b.classList.remove('active'));
   tabContents.forEach(c => c.classList.remove('active'));
 
-  // если кнопки больше нет в DOM, просто включаем контент
   const boostsTab = document.getElementById('tab-boosts');
   if (boostsTab) {
     boostsTab.classList.add('active');
   }
 
-  // открываем модалку как «меню перерождения»
   skillModalTitle.textContent = 'Потрать кристаллы';
-  skillModalDesc.textContent = 'Купи постоянные улучшения на кристаллы, они останутся на все будущие запуски.';
+
+  if (!hasSeenPrestigeTutorial) {
+    skillModalDesc.textContent = 'После перерождения ты попадаешь в меню бустов. Здесь тратишь кристаллы на постоянные улучшения, они работают во всех следующих запусках.';
+    hasSeenPrestigeTutorial = true;
+  } else {
+    skillModalDesc.textContent = 'Купи новые бусты или посмотри уже взятые.';
+  }
+
   skillModalCost.textContent = '';
   skillModalStatus.textContent = 'Выбери буст в дереве слева';
   skillModalStatus.className = '';
-  skillModalBuy.disabled = true; // пока ничего не выбрано
-
+  skillModalBuy.disabled = true;
   currentSkillId = null;
 
   skillModal.classList.remove('hidden');
+  skillModalBuy.classList.add('hidden-buy');
+  skillModalBuy.disabled = true;
+  currentSkillId = null;
 }
+
 
 
 // перерождение
@@ -319,6 +359,7 @@ hardResetButton.addEventListener('click', () => {
 
   coins = 0;
   coinsPerClick = 1;
+  gems = 0;
 
   upgrade1Cost = 10;
   upgrade5Cost = 100;
@@ -449,6 +490,8 @@ document.querySelectorAll('.skill-node').forEach(btn => {
     if (!data) return;
 
     currentSkillId = skillId;
+    skillModalBuy.classList.remove('hidden-buy');
+
 
     skillModalTitle.textContent = data.title;
     skillModalDesc.textContent = data.desc;
@@ -477,7 +520,20 @@ document.querySelectorAll('.skill-node').forEach(btn => {
     }
 
     skillModal.classList.remove('hidden');
+
+    });
   });
+
+  // гем-апгрейд
+gemsAutoBoostButton.addEventListener('click', () => {
+  if (!skillNewCurrencyBought) return;
+  if (gems < 100) return;
+
+  gems -= 100;
+  gemsAutoBoostLevel += 1;
+  autoIncomeMultiplier *= 1.2;
+
+  updateUI();
 });
 
 skillModalBuy.addEventListener('click', () => {
@@ -525,11 +581,15 @@ skillModal.addEventListener('click', (e) => {
 // авто-тик
 setInterval(() => {
   if (coinsPerSecond > 0) {
-    const baseGain = coinsPerSecond;
+    const baseGain = coinsPerSecond * autoIncomeMultiplier;
     const totalGain = Math.floor(baseGain * (1 + prestigeBonus));
+
 
     coins += totalGain;
     runCoins += totalGain;
+
+    // гемы от авто-добычи
+    gems += baseGain * 0.1; //10% от авто-дохода в сек
 
     updateUI();
   }
@@ -561,7 +621,10 @@ function saveGame() {
     skillCrit3Bought,
     skillMult1Bought,
     skillMult2Bought,
-    skillNewCurrencyBought
+    skillNewCurrencyBought,
+    gems,
+    autoIncomeMultiplier,
+    gemsAutoBoostLevel
   };
 
   localStorage.setItem(SAVE_KEY, JSON.stringify(data));
@@ -594,6 +657,9 @@ function loadGame() {
     if (typeof data.skillCrit1Bought === 'boolean') skillCrit1Bought = data.skillCrit1Bought;
     if (typeof data.skillCrit2Bought === 'boolean') skillCrit2Bought = data.skillCrit2Bought;
     if (typeof data.skillCrit3Bought === 'boolean') skillCrit3Bought = data.skillCrit3Bought;
+    if (typeof data.gems === 'number') gems = data.gems;
+    if (typeof data.autoIncomeMultiplier === 'number') autoIncomeMultiplier = data.autoIncomeMultiplier;
+    if (typeof data.gemsAutoBoostLevel === 'number') gemsAutoBoostLevel = data.gemsAutoBoostLevel;
     if (typeof data.skillMult1Bought === 'boolean') skillMult1Bought = data.skillMult1Bought;
     if (typeof data.skillMult2Bought === 'boolean') skillMult2Bought = data.skillMult2Bought;
     if (typeof data.skillNewCurrencyBought === 'boolean') skillNewCurrencyBought = data.skillNewCurrencyBought;
