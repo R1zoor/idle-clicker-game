@@ -96,6 +96,11 @@ let currentSkillId = null;
 
 const skillModalStatus = document.getElementById('skill-modal-status');
 
+// лаунчер: контейнеры игр
+const gameMenu = document.getElementById('game-menu');
+const gameClickerContainer = document.getElementById('game-clicker');
+const gamePlinkoContainer = document.getElementById('game-plinko');
+
 // вкладки
 const tabButtons = document.querySelectorAll('.tab-button');
 const tabContents = document.querySelectorAll('.tab-content');
@@ -116,6 +121,23 @@ tabButtons.forEach(btn => {
       c.classList.toggle('active', c.id === 'tab-' + tab);
     });
   });
+});
+
+// Переключение между играми (лаунчер)
+gameMenu.addEventListener('click', (e) => {
+  const target = e.target;
+  if (!(target instanceof HTMLElement)) return;
+
+  const game = target.dataset.game;
+  if (!game) return;
+
+  if (game === 'clicker') {
+    gameClickerContainer.classList.remove('hidden');
+    gamePlinkoContainer.classList.add('hidden');
+  } else if (game === 'plinko') {
+    gamePlinkoContainer.classList.remove('hidden');
+    gameClickerContainer.classList.add('hidden');
+  }
 });
 
 // ===== UI и функции =====
