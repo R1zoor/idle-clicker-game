@@ -2,164 +2,187 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Тест</title>
+  <title>Игровой лаунчер</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
-  <h1>Тестовый кликер</h1>
+  <h1>Игры</h1>
 
-  <!-- Вкладки -->
-  <div id="tabs">
-    <button class="tab-button active" data-tab="main" id="tab-btn-main">Игра</button>
-    <button class="tab-button" data-tab="upgrades" id="tab-btn-upgrades">Апгрейды</button>
-    <button class="tab-button" data-tab="prestige" id="tab-btn-prestige">Перерождение</button>
+  <!-- Меню выбора игры -->
+  <div id="game-menu" class="panel">
+    <h2>Выбор игры</h2>
+    <button data-game="clicker" id="btn-game-clicker">Idle Clicker</button>
+    <button data-game="plinko" id="btn-game-plinko">Plinko Incremental</button>
   </div>
 
-  <div id="game">
-    <!-- Вкладка: Игра -->
-    <div id="tab-main" class="tab-content active">
-      <div class="panel">
-        <h2>Ресурсы</h2>
-        <p>
-          <img src="img/coin.png" alt="монета" class="coin-icon">
-          <span id="coins-main">0</span>
-        </p>
-        <p>Доход в секунду: <span id="coins-per-second">0</span></p>
-      </div>
-
-      <!-- Гемы на главной, изначально скрыты -->
-      <div id="gems-main-panel" class="panel hidden">
-        <p>Гемы: <span id="gems-main">0</span></p>
-      </div>
-
-      <div class="panel">
-        <h2>Криты</h2>
-        <p>Шанс крита: <span id="crit-chance-text">5%</span></p>
-        <p>Множитель крита: <span id="crit-mult-text">x3</span></p>
-      </div>
-
-      <div class="panel">
-        <h2>Клик</h2>
-        <button id="click-button">
-          Клик
-        </button>
-      </div>
+  <!-- КОНТЕЙНЕР КЛИКЕРА (твой старый контент) -->
+  <div id="game-clicker">
+    <!-- Вкладки -->
+    <div id="tabs">
+      <button class="tab-button active" data-tab="main" id="tab-btn-main">Игра</button>
+      <button class="tab-button" data-tab="upgrades" id="tab-btn-upgrades">Апгрейды</button>
+      <button class="tab-button" data-tab="prestige" id="tab-btn-prestige">Перерождение</button>
     </div>
 
-    <!-- Вкладка: Апгрейды -->
-    <div id="tab-upgrades" class="tab-content">
-      <div class="panel">
-        <h2>Ресурсы</h2>
-        <p>
-          <img src="img/coin.png" alt="монета" class="coin-icon">
-          <span id="coins-upgrades">0</span>
-        </p>
+    <div id="game">
+      <!-- Вкладка: Игра -->
+      <div id="tab-main" class="tab-content active">
+        <div class="panel">
+          <h2>Ресурсы</h2>
+          <p>
+            <img src="img/coin.png" alt="монета" class="coin-icon">
+            <span id="coins-main">0</span>
+          </p>
+          <p>Доход в секунду: <span id="coins-per-second">0</span></p>
+        </div>
+
+        <!-- Гемы на главной, изначально скрыты -->
+        <div id="gems-main-panel" class="panel hidden">
+          <p>Гемы: <span id="gems-main">0</span></p>
+        </div>
+
+        <div class="panel">
+          <h2>Криты</h2>
+          <p>Шанс крита: <span id="crit-chance-text">5%</span></p>
+          <p>Множитель крита: <span id="crit-mult-text">x3</span></p>
+        </div>
+
+        <div class="panel">
+          <h2>Клик</h2>
+          <button id="click-button">
+            Клик
+          </button>
+        </div>
       </div>
 
-      <!-- Гемы на вкладке апгрейдов, изначально скрыты -->
-      <div id="gems-upgrades-panel" class="panel hidden">
-        <p>Гемы: <span id="gems-upgrades">0</span></p>
+      <!-- Вкладка: Апгрейды -->
+      <div id="tab-upgrades" class="tab-content">
+        <div class="panel">
+          <h2>Ресурсы</h2>
+          <p>
+            <img src="img/coin.png" alt="монета" class="coin-icon">
+            <span id="coins-upgrades">0</span>
+          </p>
+        </div>
+
+        <!-- Гемы на вкладке апгрейдов, изначально скрыты -->
+        <div id="gems-upgrades-panel" class="panel hidden">
+          <p>Гемы: <span id="gems-upgrades">0</span></p>
+        </div>
+
+        <div class="panel">
+          <h2>Производство</h2>
+
+          <button id="upgrade1-button">
+            Улучшить клик (+1 за клик) — цена: <span id="upgrade1-cost">10</span>
+          </button>
+
+          <button id="upgrade5-button">
+            Улучшить клик (+5 за клик) — цена: <span id="upgrade5-cost">100</span>
+          </button>
+
+          <button id="upgrade10-button">
+            Улучшить клик (+10 за клик) — цена: <span id="upgrade10-cost">1000</span>
+          </button>
+
+          <button id="auto-button">
+            Купить авто-добычу (+1 в сек) — цена: <span id="auto-cost">50</span>
+          </button>
+
+          <button id="auto2-button">
+            Купить супер-добычу (+5 в сек) — цена: <span id="auto2-cost">250</span>
+          </button>
+        </div>
+
+        <!-- Магазин гем-апгрейдов, скрыт до открытия ноды новой валюты -->
+        <div id="gems-upgrades-shop" class="panel hidden">
+          <h2>Гем-апгрейды</h2>
+          <button id="gems-auto-boost-button">
+            +20% к авто-добыче (Стоимость: 100 гемов)
+          </button>
+        </div>
       </div>
 
-      <div class="panel">
-        <h2>Производство</h2>
+      <!-- Вкладка: Бусты -->
+      <div id="tab-boosts" class="tab-content">
+        <div class="panel">
+          <h2>Древо перерождений</h2>
+          <p>Кристаллы: <span id="prestige-points">0</span></p>
+          <p>Бонус к доходу: <span id="prestige-bonus-text">+0%</span></p>
 
-        <button id="upgrade1-button">
-          Улучшить клик (+1 за клик) — цена: <span id="upgrade1-cost">10</span>
-        </button>
+          <div id="skill-modal" class="modal hidden">
+            <div class="modal-content">
+              <button id="skill-modal-close" class="modal-close">✕</button>
+              <h3 id="skill-modal-title">Название буста</h3>
+              <p id="skill-modal-desc">Описание эффекта буста.</p>
+              <p id="skill-modal-cost">Стоимость: 0 кристаллов</p>
+              <p id="skill-modal-status"></p>
+              <button id="skill-modal-buy">Купить</button>
+            </div>
+          </div>
 
-        <button id="upgrade5-button">
-          Улучшить клик (+5 за клик) — цена: <span id="upgrade5-cost">100</span>
-        </button>
+          <div id="skill-tree">
+            <!-- Корневой узел -->
+            <button class="skill-node" id="skill-root-income" data-skill-id="root-income">
+              %
+            </button>
 
-        <button id="upgrade10-button">
-          Улучшить клик (+10 за клик) — цена: <span id="upgrade10-cost">1000</span>
-        </button>
+            <!-- Ветка A: крит-шанс -->
+            <button class="skill-node hidden" id="skill-crit1" data-skill-id="crit1">
+              C1
+            </button>
+            <button class="skill-node hidden" id="skill-crit2" data-skill-id="crit2">
+              C2
+            </button>
+            <button class="skill-node hidden" id="skill-crit3" data-skill-id="crit3">
+              C3
+            </button>
 
-        <button id="auto-button">
-          Купить авто-добычу (+1 в сек) — цена: <span id="auto-cost">50</span>
-        </button>
+            <!-- Ветка B: крит-множитель -->
+            <button class="skill-node hidden" id="skill-mult1" data-skill-id="mult1">
+              M1
+            </button>
+            <button class="skill-node hidden" id="skill-mult2" data-skill-id="mult2">
+              M2
+            </button>
 
-        <button id="auto2-button">
-          Купить супер-добычу (+5 в сек) — цена: <span id="auto2-cost">250</span>
-        </button>
-      </div>
-
-      <!-- Магазин гем-апгрейдов, скрыт до открытия ноды новой валюты -->
-      <div id="gems-upgrades-shop" class="panel hidden">
-        <h2>Гем-апгрейды</h2>
-        <button id="gems-auto-boost-button">
-          +20% к авто-добыче (Стоимость: 100 гемов)
-        </button>
-      </div>
-    </div>
-
-    <!-- Вкладка: Бусты -->
-    <div id="tab-boosts" class="tab-content">
-      <div class="panel">
-        <h2>Древо перерождений</h2>
-        <p>Кристаллы: <span id="prestige-points">0</span></p>
-        <p>Бонус к доходу: <span id="prestige-bonus-text">+0%</span></p>
-
-        <div id="skill-modal" class="modal hidden">
-          <div class="modal-content">
-            <button id="skill-modal-close" class="modal-close">✕</button>
-            <h3 id="skill-modal-title">Название буста</h3>
-            <p id="skill-modal-desc">Описание эффекта буста.</p>
-            <p id="skill-modal-cost">Стоимость: 0 кристаллов</p>
-            <p id="skill-modal-status"></p>
-            <button id="skill-modal-buy">Купить</button>
+            <!-- Ветка C: новая валюта -->
+            <button class="skill-node hidden" id="skill-new-currency" data-skill-id="new-currency">
+              $
+            </button>
           </div>
         </div>
+      </div>
 
-        <div id="skill-tree">
-          <!-- Корневой узел -->
-          <button class="skill-node" id="skill-root-income" data-skill-id="root-income">
-            %
-          </button>
+      <!-- Вкладка: Перерождение -->
+      <div id="tab-prestige" class="tab-content">
+        <div class="panel">
+          <h2>Перерождение</h2>
+          <p>Всего добыто: <span id="lifetime-coins">0</span></p>
 
-          <!-- Ветка A: крит-шанс -->
-          <button class="skill-node hidden" id="skill-crit1" data-skill-id="crit1">
-            C1
-          </button>
-          <button class="skill-node hidden" id="skill-crit2" data-skill-id="crit2">
-            C2
-          </button>
-          <button class="skill-node hidden" id="skill-crit3" data-skill-id="crit3">
-            C3
+          <button id="prestige-button">
+            Переродиться и получить кристаллы
           </button>
 
-          <!-- Ветка B: крит-множитель -->
-          <button class="skill-node hidden" id="skill-mult1" data-skill-id="mult1">
-            M1
-          </button>
-          <button class="skill-node hidden" id="skill-mult2" data-skill-id="mult2">
-            M2
-          </button>
-
-          <!-- Ветка C: новая валюта -->
-          <button class="skill-node hidden" id="skill-new-currency" data-skill-id="new-currency">
-            $
+          <button id="hard-reset-button">
+            Полный сброс прогресса
           </button>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Вкладка: Перерождение -->
-    <div id="tab-prestige" class="tab-content">
-      <div class="panel">
-        <h2>Перерождение</h2>
-        <p>Всего добыто: <span id="lifetime-coins">0</span></p>
-
-        <button id="prestige-button">
-          Переродиться и получить кристаллы
-        </button>
-
-        <button id="hard-reset-button">
-          Полный сброс прогресса
-        </button>
-      </div>
+  <!-- КОНТЕЙНЕР PLINKO (через iframe) -->
+  <div id="game-plinko" class="hidden">
+    <div class="panel" style="width: 100%; max-width: 600px; margin: 0 auto;">
+      <h2>Plinko Incremental</h2>
+      <iframe
+        src="https://r1zoor.github.io/plinko-incremental/"
+        style="width: 100%; height: 700px; border: none;"
+        loading="lazy">
+      </iframe>
     </div>
   </div>
 
