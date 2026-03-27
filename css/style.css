@@ -296,3 +296,17 @@ body {
 #game-menu button {
   margin: 5px;
 }
+
+#start-screen {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+#start-screen .panel {
+  max-width: 400px;
+}
+
+#start-screen button {
+  margin: 5px;
+}
