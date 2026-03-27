@@ -90,7 +90,25 @@ const gemsMainPanel = document.getElementById('gems-main-panel');
 const gemsUpgradesPanel = document.getElementById('gems-upgrades-panel');
 const gemsUpgradesShop = document.getElementById('gems-upgrades-shop');
 
+// стартовый экран и контейнеры игр
+const startScreen = document.getElementById('start-screen');
+const gameClickerContainer = document.getElementById('game-clicker');
+const gamePlinkoContainer = document.getElementById('game-plinko');
+const startClickerBtn = document.getElementById('start-clicker-btn');
+const startPlinkoBtn = document.getElementById('start-plinko-btn');
 
+// выбор игры при запуске
+startClickerBtn.addEventListener('click', () => {
+  startScreen.classList.add('hidden');
+  gameClickerContainer.classList.remove('hidden');
+  gamePlinkoContainer.classList.add('hidden');
+});
+
+startPlinkoBtn.addEventListener('click', () => {
+  startScreen.classList.add('hidden');
+  gamePlinkoContainer.classList.remove('hidden');
+  gameClickerContainer.classList.add('hidden');
+});
 
 let currentSkillId = null;
 
