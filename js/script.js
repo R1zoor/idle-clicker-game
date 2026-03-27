@@ -7,6 +7,14 @@ let gemsAutoBoostLevel = 0;
 const gemsAutoBoostButton = document.getElementById('gems-auto-boost-button');
 let autoIncomeMultiplier = 1;
 
+const GEMS_AUTO_BOOST_MAX_LEVEL = 10;
+const GEMS_AUTO_BOOST_BASE_COST = 100;
+const GEMS_AUTO_BOOST_COST_MULT = 1.5;
+
+function getGemsAutoBoostCost(level) {
+  return Math.floor(GEMS_AUTO_BOOST_BASE_COST * Math.pow(GEMS_AUTO_BOOST_COST_MULT, level));
+}
+
 let upgrade1Cost = 10;     // +1 за клик
 let upgrade5Cost = 100;    // +5 за клик
 let upgrade10Cost = 1000;  // +10 за клик
@@ -35,7 +43,6 @@ let skillMult2Bought = false;
 let skillNewCurrencyBought = false;
 
 let hasSeenPrestigeTutorial = false;
-
 
 // константы (DOM)
 const coinsMainSpan = document.getElementById('coins-main');
@@ -90,34 +97,44 @@ const gemsMainPanel = document.getElementById('gems-main-panel');
 const gemsUpgradesPanel = document.getElementById('gems-upgrades-panel');
 const gemsUpgradesShop = document.getElementById('gems-upgrades-shop');
 
-// стартовый экран и контейнеры игр
+let currentSkillId = null;
+
+const skillModalStatus = document.getElementById('skill-modal-status');
+
+/// стартовый экран и контейнеры игр
 const startScreen = document.getElementById('start-screen');
 const gameClickerContainer = document.getElementById('game-clicker');
 const gamePlinkoContainer = document.getElementById('game-plinko');
 const startClickerBtn = document.getElementById('start-clicker-btn');
 const startPlinkoBtn = document.getElementById('start-plinko-btn');
 
-// выбор игры при запуске
-startClickerBtn.addEventListener('click', () => {
+// выбор игры: один раз, без возможности переключиться
+function chooseGame(game) {
+  if (!startScreen || !gameClickerContainer || !gamePlinkoContainer) return;
+
+  // прячем оверлей навсегда (до перезагрузки)
   startScreen.classList.add('hidden');
-  gameClickerContainer.classList.remove('hidden');
-  gamePlinkoContainer.classList.add('hidden');
-});
 
-startPlinkoBtn.addEventListener('click', () => {
-  startScreen.classList.add('hidden');
-  gamePlinkoContainer.classList.remove('hidden');
-  gameClickerContainer.classList.add('hidden');
-});
+  if (game === 'clicker') {
+    gameClickerContainer.classList.remove('hidden');
+    gamePlinkoContainer.classList.add('hidden');
+  } else if (game === 'plinko') {
+    gamePlinkoContainer.classList.remove('hidden');
+    gameClickerContainer.classList.add('hidden');
+  }
 
-let currentSkillId = null;
+  // после выбора отвязываем обработчики, чтобы нельзя было вызвать ещё раз
+  if (startClickerBtn) startClickerBtn.onclick = null;
+  if (startPlinkoBtn) startPlinkoBtn.onclick = null;
+}
 
-const skillModalStatus = document.getElementById('skill-modal-status');
+if (startClickerBtn) {
+  startClickerBtn.addEventListener('click', () => chooseGame('clicker'));
+}
 
-// лаунчер: контейнеры игр
-const gameMenu = document.getElementById('game-menu');
-const gameClickerContainer = document.getElementById('game-clicker');
-const gamePlinkoContainer = document.getElementById('game-plinko');
+if (startPlinkoBtn) {
+  startPlinkoBtn.addEventListener('click', () => chooseGame('plinko'));
+}
 
 // вкладки
 const tabButtons = document.querySelectorAll('.tab-button');
@@ -141,23 +158,6 @@ tabButtons.forEach(btn => {
   });
 });
 
-// Переключение между играми (лаунчер)
-gameMenu.addEventListener('click', (e) => {
-  const target = e.target;
-  if (!(target instanceof HTMLElement)) return;
-
-  const game = target.dataset.game;
-  if (!game) return;
-
-  if (game === 'clicker') {
-    gameClickerContainer.classList.remove('hidden');
-    gamePlinkoContainer.classList.add('hidden');
-  } else if (game === 'plinko') {
-    gamePlinkoContainer.classList.remove('hidden');
-    gameClickerContainer.classList.add('hidden');
-  }
-});
-
 // ===== UI и функции =====
 
 function calcPrestigeGain() {
@@ -169,19 +169,42 @@ function updateTabsVisibility() {
   tabBtnPrestige.classList.remove('hidden');
 }
 
-
 function updateUI() {
   coinsMainSpan.textContent = coins;
   coinsUpgradesSpan.textContent = coins;
 
   gemsMainSpan.textContent = Math.floor(gems);
   gemsUpgradesSpan.textContent = Math.floor(gems);
-  gemsAutoBoostButton.disabled = !skillNewCurrencyBought || gems < 100;
+
+  if (!skillNewCurrencyBought) {
+    gemsAutoBoostButton.disabled = true;
+    gemsAutoBoostButton.textContent = '+20% к авто-добыче (Стоимость: 100 гемов)';
+  } else if (gemsAutoBoostLevel >= GEMS_AUTO_BOOST_MAX_LEVEL) {
+    gemsAutoBoostButton.disabled = true;
+    gemsAutoBoostButton.textContent = 'Максимальный уровень гем-апгрейда';
+  } else {
+    const cost = getGemsAutoBoostCost(gemsAutoBoostLevel);
+    gemsAutoBoostButton.disabled = gems < cost;
+    gemsAutoBoostButton.textContent = `+20% к авто-добыче (Стоимость: ${cost} гемов)`;
+  }
+
+  if (!skillNewCurrencyBought) {
+    // ветка ещё не открыта
+    gemsAutoBoostButton.disabled = true;
+    gemsAutoBoostButton.textContent = '+20% к авто-добыче (Стоимость: 100 гемов)';
+  } else if (gemsAutoBoostLevel >= GEMS_AUTO_BOOST_MAX_LEVEL) {
+    // достигнут максимум
+    gemsAutoBoostButton.disabled = true;
+    gemsAutoBoostButton.textContent = 'Максимальный уровень гем-апгрейда';
+  } else {
+    // можно покупать
+    const cost = GEMS_AUTO_BOOST_BASE_COST; // если захочешь — можешь сделать рост цены от уровня
+    gemsAutoBoostButton.disabled = gems < cost;
+    gemsAutoBoostButton.textContent = `+20% к авто-добыче (Стоимость: ${cost} гемов)`;
+  }
 
   // показываем авто-добычу с учётом мультипликатора
   coinsPerSecondSpan.textContent = Math.floor(coinsPerSecond * autoIncomeMultiplier);
-
-
 
   // цены
   upgrade1CostSpan.textContent = upgrade1Cost;
@@ -203,7 +226,6 @@ function updateUI() {
   lifetimeCoinsSpan.textContent = runCoins;
   prestigePointsSpan.textContent = prestigePoints;
   prestigeBonusText.textContent = '+' + Math.round(prestigeBonus * 100) + '%';
-
 
   const gain = calcPrestigeGain();
   prestigeButton.disabled = gain <= 0;
@@ -234,12 +256,12 @@ function updateUI() {
   // Ветка B: крит-множитель
   skillMult2Btn.classList.toggle('hidden', !skillMult1Bought);
 
-    const gemsUnlocked = skillNewCurrencyBought;
-    if (gemsMainPanel && gemsUpgradesPanel && gemsUpgradesShop) {
-      gemsMainPanel.classList.toggle('hidden', !gemsUnlocked);
-      gemsUpgradesPanel.classList.toggle('hidden', !gemsUnlocked);
-      gemsUpgradesShop.classList.toggle('hidden', !gemsUnlocked);
-    }
+  const gemsUnlocked = skillNewCurrencyBought;
+  if (gemsMainPanel && gemsUpgradesPanel && gemsUpgradesShop) {
+    gemsMainPanel.classList.toggle('hidden', !gemsUnlocked);
+    gemsUpgradesPanel.classList.toggle('hidden', !gemsUnlocked);
+    gemsUpgradesShop.classList.toggle('hidden', !gemsUnlocked);
+  }
 
   updateTabsVisibility();
 }
@@ -348,8 +370,6 @@ function openPrestigeScreen() {
   currentSkillId = null;
 }
 
-
-
 // перерождение
 prestigeButton.addEventListener('click', () => {
   const gain = calcPrestigeGain();
@@ -384,11 +404,10 @@ prestigeButton.addEventListener('click', () => {
 
   saveGame();
   updateUI();
-  
+
   // экран бустов
   openPrestigeScreen();
 });
-
 
 // полный сброс
 hardResetButton.addEventListener('click', () => {
@@ -417,6 +436,7 @@ hardResetButton.addEventListener('click', () => {
   prestigePoints = 0;
   prestigeBonus = 0;
 
+  // старые уровни (если где-то ещё используются)
   skillCritChanceLevel = 0;
   skillCritMultLevel = 0;
   skillIncomeLevel = 0;
@@ -521,7 +541,6 @@ const skillData = {
 
 // === ДЕРЕВО ПРОКАЧКИ  ===
 
-
 // общий обработчик на иконки древа
 document.querySelectorAll('.skill-node').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -531,7 +550,6 @@ document.querySelectorAll('.skill-node').forEach(btn => {
 
     currentSkillId = skillId;
     skillModalBuy.classList.remove('hidden-buy');
-
 
     skillModalTitle.textContent = data.title;
     skillModalDesc.textContent = data.desc;
@@ -560,16 +578,18 @@ document.querySelectorAll('.skill-node').forEach(btn => {
     }
 
     skillModal.classList.remove('hidden');
-
-    });
   });
+});
 
-  // гем-апгрейд
+// гем-апгрейд
 gemsAutoBoostButton.addEventListener('click', () => {
   if (!skillNewCurrencyBought) return;
-  if (gems < 100) return;
+  if (gemsAutoBoostLevel >= GEMS_AUTO_BOOST_MAX_LEVEL) return;
 
-  gems -= 100;
+  const cost = getGemsAutoBoostCost(gemsAutoBoostLevel);
+  if (gems < cost) return;
+
+  gems -= cost;
   gemsAutoBoostLevel += 1;
   autoIncomeMultiplier *= 1.2;
 
@@ -579,7 +599,7 @@ gemsAutoBoostButton.addEventListener('click', () => {
 skillModalBuy.addEventListener('click', () => {
   if (!currentSkillId) return;
 
-  const data = skillData[currentSkillId]; // ← эта строка обязательна
+  const data = skillData[currentSkillId];
   if (!data) return;
   if (!data.canBuy()) return;
 
@@ -605,9 +625,6 @@ skillModalBuy.addEventListener('click', () => {
   }
 });
 
-
-  // обновляем состояние модалки после покупки
-
 skillModalClose.addEventListener('click', () => {
   skillModal.classList.add('hidden');
 });
@@ -624,12 +641,11 @@ setInterval(() => {
     const baseGain = coinsPerSecond * autoIncomeMultiplier;
     const totalGain = Math.floor(baseGain * (1 + prestigeBonus));
 
-
     coins += totalGain;
     runCoins += totalGain;
 
     // гемы от авто-добычи
-    gems += baseGain * 0.1; //10% от авто-дохода в сек
+    gems += baseGain * 0.1; // 10% от авто-дохода в сек
 
     updateUI();
   }

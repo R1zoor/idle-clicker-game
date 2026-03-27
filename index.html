@@ -10,18 +10,6 @@
 <body>
   <h1>Игры</h1>
 
-  <!-- Меню выбора игры -->
-  <div id="game-menu" class="panel">
-    <h2>Выбор игры</h2>
-    <button data-game="clicker" id="btn-game-clicker">Idle Clicker</button>
-    <button data-game="plinko" id="btn-game-plinko">Plinko Incremental</button>
-  </div>
-
-  <!-- КОНТЕЙНЕР КЛИКЕРА (твой старый контент) -->
-  <div id="game-clicker">
-    <body>
-  <h1>Игры</h1>
-
   <!-- Стартовый экран выбора игры -->
   <div id="start-screen">
     <div class="panel">
@@ -31,7 +19,7 @@
     </div>
   </div>
 
-  <!-- Контейнер кликера (как было) -->
+  <!-- Контейнер кликера -->
   <div id="game-clicker" class="hidden">
     <!-- Вкладки -->
     <div id="tabs">
@@ -39,27 +27,6 @@
       <button class="tab-button" data-tab="upgrades" id="tab-btn-upgrades">Апгрейды</button>
       <button class="tab-button" data-tab="prestige" id="tab-btn-prestige">Перерождение</button>
     </div>
-
-    <div id="game">
-      <!-- дальше БЕЗ ИЗМЕНЕНИЙ весь твой кликер: tab-main, tab-upgrades, tab-boosts, tab-prestige -->
-      ...
-    </div>
-  </div>
-
-  <!-- Контейнер Plinko (через iframe) -->
-  <div id="game-plinko" class="hidden">
-    <div class="panel" style="width: 100%; max-width: 600px; margin: 0 auto;">
-      <h2>Plinko Incremental</h2>
-      <iframe
-        src="https://r1zoor.github.io/plinko-incremental/"
-        style="width: 100%; height: 700px; border: none;"
-        loading="lazy">
-      </iframe>
-    </div>
-  </div>
-
-  <script src="js/script.js"></script>
-</body>
 
     <div id="game">
       <!-- Вкладка: Игра -->
