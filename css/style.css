@@ -288,3 +288,11 @@ body {
   display: none;
 }
 
+#game-menu {
+  max-width: 500px;
+  margin: 0 auto 20px;
+}
+
+#game-menu button {
+  margin: 5px;
+}
